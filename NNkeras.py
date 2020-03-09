@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar  8 19:58:07 2020
+Created on Sat Mar  7 23:57:06 2020
 
 @author: Lenovo
 """
 
+
+
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
+from tensorflow.keras.models import Model
+import tensorflow.keras as k
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import make_pipeline
+from collections import Counter
+from sklearn.linear_model import LogisticRegression
+import time
+from keras.utils import to_categorical
 
 import numpy as np
 import pandas as pd
@@ -68,61 +85,40 @@ column_trans=make_column_transformer((OneHotEncoder(),['Mjob','Fjob',
 'reason','guardian']),remainder='passthrough')
 
 data=column_trans.fit_transform(df)
-
-
 n1 = data.shape[0]
 n2 = data.shape[1]
 m=int(0.8*n1)
 train=data[:m,:]
 test=data[m:-1,:]
 
+X_train=train[:,0:n2-1]
+y_train=train[:,n2-1]
+y_train = np.reshape(y_train, (len(y_train),1))
+y_train = to_categorical(y_train)
+
+
+X_test=test[:,0:n2-1]
+y_test=test[:,n2-1]
+y_test = np.reshape(y_test, (len(y_test),1))
+y_test = to_categorical(y_test)
+
+
+model = k.models.Sequential()
+model.add(Dense(32, input_shape=(n2-1,)))
+model.add(Dense(16))
+model.add(Dense(8))
+model.add(Dense(5))
+
+
+model.compile(optimizer='Adamax',
+             loss='categorical_crossentropy', metrics=['accuracy'])
+model.summary()
+
+
+model.fit(X_train, y_train,
+            epochs=500,
+            shuffle=True)
 
 
 
-def sigmoid(z):
-    sigmoid_f = 1 / (1 + np.exp(-z)) #YOUR CODE HERE
-    return sigmoid_f 
-
-
-# construct the data matrix X
-
-X = np.ones([n1,n2]) 
-X[:,1:n2] = data[:,0:(n2-1)]
-print(X.shape)
-# print(X[:5,:])
-
-
-
-# predictive function definition
-def f_pred(X,w): 
-    p = sigmoid(X.dot(w)) #YOUR CODE HERE
-    return p
-
-
-# loss function definition
-def loss_logreg(y_pred,y): 
-    n = len(y)
-    loss = -1/n* ( y.T.dot(np.log(y_pred)) + (1-y).T.dot(np.log(1-y_pred)) ) #YOUR CODE HERE
-    return loss
-
-# run logistic regression with scikit-learn
-start = time.time()
-logreg_sklearn = LogisticRegression(C=1e5,solver='sag',
-                                random_state=42) # scikit-learn logistic regression
-clf=logreg_sklearn.fit(train[:,0:45], train[:,45]) # learn the model parameters #YOUR CODE HERE
-print('Time=',time.time() - start)
-
-
-# compute loss value
-# w_sklearn = np.zeros([46,1])
-# w_sklearn[0,0] = logreg_sklearn.intercept_
-# w_sklearn[1:46,0] = logreg_sklearn.coef_
-# print(w_sklearn)
-# loss_sklearn = loss_logreg(f_pred(X,w_sklearn),data[:,(n2-1)][:,None])
-# print('loss sklearn=',loss_sklearn)
-
-
-predict=clf.predict(test[:,0:(n2-1)])
-predict_proba=clf.predict_proba(test[:,0:(n2-1)])
-score=clf.score(test[:,0:(n2-1)], test[:,(n2-1)])
-
+score, acc = model.evaluate(X_test, y_test)
