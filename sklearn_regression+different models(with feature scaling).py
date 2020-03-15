@@ -8,6 +8,7 @@ Created on Sun Mar  8 19:58:07 2020
 
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
@@ -15,7 +16,6 @@ from sklearn.pipeline import make_pipeline
 from collections import Counter
 from sklearn.linear_model import LogisticRegression
 import time
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import make_moons, make_circles, make_classification
@@ -28,18 +28,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import make_column_transformer
-from sklearn.pipeline import make_pipeline
-from collections import Counter
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_validate
-import time
 from sklearn.preprocessing import StandardScaler 
-from sklearn import preprocessing
 from sklearn.preprocessing import MinMaxScaler
 
 
