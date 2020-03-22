@@ -48,7 +48,6 @@ from sklearn.impute import SimpleImputer
 
 df=pd.read_csv('train.csv',delimiter=',') 
 
-
 Embarked_map = {'S':0, 'C': 1, 'Q': 2}
 sex_map = {'male': 1, 'female': 0}
 
@@ -61,12 +60,14 @@ df = df.drop(columns="PassengerId")
 df = df.drop(columns="Name")
 df = df.drop(columns="Ticket")
 
-
 imputer = SimpleImputer(missing_values=np.nan, strategy='median')
 df[['Age']] = imputer.fit_transform(df[['Age']])
+df['Cabin'] = df['Cabin'].replace(np.nan, 'Z1', regex=True)
+for i in range(df.shape[0]):
+    letter = df.loc[i,'Cabin']
+    df.loc[i,'Cabin'] = letter[0]
+df['Embarked'] = df['Embarked'].replace(np.nan, 4, regex=True)
 
-df['Cabin'] = df['Cabin'].replace(np.nan, 'aa', regex=True)
-df['Embarked'] = df['Embarked'].replace(np.nan, 3, regex=True)
 df = pd.concat([df,pd.get_dummies(df['Cabin'], prefix='Cabin')],axis=1)
 
 column_trans=make_column_transformer((OneHotEncoder(),['Cabin']),remainder='passthrough')
